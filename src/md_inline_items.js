@@ -11,7 +11,8 @@
  *   2. resolveItemText (function): a function that will return the text content
  *      of the anchor for a linked item. This function is passed two arguments:
  *      the type of item (either 'topic' or 'note'), and the URL of the item
- *      derived from the type, projectBaseURL, and id.
+ *      derived from the type, projectBaseURL, and id. This function _must_ be
+ *      synchronous.
  */
 
 const TYPES = require('./types')
