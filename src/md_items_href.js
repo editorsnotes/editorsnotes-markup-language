@@ -21,14 +21,15 @@ function transformHref(token, makeURL) {
   if (match) {
     let itemType = TYPES[match[1]]
       , itemID = match[2]
+      , rel = 'http://editorsnotes.org/v#' + itemType
 
     token.attrs[hrefIndex][1] = makeURL(itemType, itemID);
 
     if (relIndex !== undefined) {
       let oldRel = token.attrs[relIndex][1];
-      token.attrs[relIndex][1] = oldRel + ' ' + itemType;
+      token.attrs[relIndex][1] = oldRel + ' ' + rel;
     } else {
-      token.attrs.push([ 'rel', itemType ])
+      token.attrs.push([ 'rel', rel ])
     }
   }
 }

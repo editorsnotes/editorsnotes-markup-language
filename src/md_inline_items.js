@@ -21,11 +21,12 @@ function render(tokens, idx) {
   var token = tokens[idx]
     , itemType = token.meta.type
     , href = token.meta.url
+    , rel = 'http://editorsnotes.org/v#' + itemType
 
   return (
     '<a ' +
       'class="en-item en-item-' + itemType + '" ' +
-      'rel="' + itemType + '" ' +
+      'rel="' + rel + '" ' +
       'href="' + href + '"' +
     '>' + token.content + '</a>'
   )

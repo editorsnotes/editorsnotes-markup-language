@@ -17,12 +17,12 @@ test('Inline item links', function (t) {
 
   t.equal(
     parser.render('mentioning @@t123').trim(),
-    '<p>mentioning <a class="en-item en-item-topic" rel="topic" href="/projects/emma/topics/123/">topic 123</a></p>'
+    '<p>mentioning <a class="en-item en-item-topic" rel="http://editorsnotes.org/v#topic" href="/projects/emma/topics/123/">topic 123</a></p>'
   )
 
   t.equal(
     parser.render('mentioning @@n456!').trim(),
-    '<p>mentioning <a class="en-item en-item-note" rel="note" href="/projects/emma/notes/456/">note 456</a>!</p>'
+    '<p>mentioning <a class="en-item en-item-note" rel="http://editorsnotes.org/v#note" href="/projects/emma/notes/456/">note 456</a>!</p>'
   )
 });
 
@@ -38,16 +38,16 @@ test('Items as hrefs', function (t) {
 
   t.equal(
     parser.render('This is a link to [a topic](@@t500).').trim(),
-    '<p>This is a link to <a href="/projects/emma/topics/500/" rel="topic">a topic</a>.</p>'
+    '<p>This is a link to <a href="/projects/emma/topics/500/" rel="http://editorsnotes.org/v#topic">a topic</a>.</p>'
   )
 
   t.equal(
     parser.render('This is a link to [a note](@@n365).').trim(),
-    '<p>This is a link to <a href="/projects/emma/notes/365/" rel="note">a note</a>.</p>'
+    '<p>This is a link to <a href="/projects/emma/notes/365/" rel="http://editorsnotes.org/v#note">a note</a>.</p>'
   )
 
   t.equal(
     parser.render('This is a link to [a document](@@d7).').trim(),
-    '<p>This is a link to <a href="/projects/emma/documents/7/" rel="document">a document</a>.</p>'
+    '<p>This is a link to <a href="/projects/emma/documents/7/" rel="http://editorsnotes.org/v#document">a document</a>.</p>'
   )
 });
