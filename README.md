@@ -1,4 +1,4 @@
-# Editors' Notes markup language
+# Editors' Notes markup parser
 This is parser for a custom flavor of [CommonMark] that
 includes extensions for authoring scholarly notes on [Editors' Notes]. The
 following additions are supported, based off of conventions in [Pandoc] and

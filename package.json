@@ -1,9 +1,8 @@
 {
-  "name": "editorsnotes-md",
+  "name": "editorsnotes-markup-parser",
   "version": "0.1.0",
   "author": "Patrick Golden",
-  "description": "Custom markup format for Editors' Notes notes",
-  "private": true,
+  "description": "Parser for Editors' Notes markup language",
   "main": "lib/index.js",
   "scripts": {
     "compile": "rm -rf lib && babel src --out-dir lib",
