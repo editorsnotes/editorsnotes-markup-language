@@ -51,3 +51,22 @@ test('Items as hrefs', function (t) {
     '<p>This is a link to <a href="/projects/emma/documents/7/" rel="http://editorsnotes.org/v#document">a document</a>.</p>'
   )
 });
+
+test('Citations', function (t) {
+  var citationPlugin = require('../md_citations')
+    , parser
+
+  t.plan(1);
+
+  parser = require('markdown-it')().use(citationPlugin, {
+    projectBaseURL: '/projects/emma/',
+    makeCitationText: function (cite) {
+      return (cite.prefix || '') + cite.documentURL + (cite.locator || '');
+    }
+  });
+
+  t.equal(
+    parser.render('This claim needs a citation [see @@d1, page 1], I think.').trim(),
+    '<p>This claim needs a citation <cite>see /projects/emma/documents/1/, page 1</cite>, I think.</p>'
+  )
+});
