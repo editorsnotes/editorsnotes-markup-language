@@ -70,3 +70,25 @@ test('Citations', function (t) {
     '<p>This claim needs a citation <cite>see /projects/emma/documents/1/, page 1</cite>, I think.</p>'
   )
 });
+
+test('Document block', function (t) {
+  var documentBlockPlugin = require('../md_document_block')
+    , parser
+
+  t.plan(1);
+
+  parser = require('markdown-it')().use(documentBlockPlugin, {
+    projectBaseURL: '/projects/emma/',
+    makeCitationText: function (documentURL) {
+      return 'Document #' + documentURL.match(/\d+/)[0];
+    }
+  });
+
+  t.equal(
+    parser.render('::: document 1\nThis is in the document block.\n:::\nThis is not.').trim(),
+    (
+      '<div class="doc-block"><div class="doc">Document #1</div>' +
+      '<p>This is in the document block.</p>\n</div><p>This is not.</p>'
+    )
+  )
+});
