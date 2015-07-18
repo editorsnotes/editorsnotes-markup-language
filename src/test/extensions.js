@@ -3,7 +3,7 @@
 var test = require('tape')
 
 test('Inline item links', function (t) {
-  var inlinePlugin = require('../md_inline_items')
+  var inlinePlugin = require('../md_items_inline')
     , parser
 
   parser = require('markdown-it')().use(inlinePlugin, {

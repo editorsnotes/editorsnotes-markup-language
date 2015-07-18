@@ -1,7 +1,7 @@
 "use strict"
 
 module.exports = function (opts) {
-  var inlinePlugin = require('./md_inline_items')
+  var inlinePlugin = require('./md_items_inline')
     , hrefPlugin = require('./md_items_href')
 
   opts = opts || {};
