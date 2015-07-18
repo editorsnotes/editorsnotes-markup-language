@@ -1,6 +1,6 @@
 {
   "name": "editorsnotes-markup-parser",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "author": "Patrick Golden",
   "description": "Parser for Editors' Notes markup language",
   "main": "lib/index.js",
