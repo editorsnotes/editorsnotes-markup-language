@@ -32,13 +32,15 @@ function createRule(md, projectBaseURL, makeCitationText) {
       , labelStart
       , labelEnd
       , label
+      , citations
 
+    // Continue only if starting with a link label
     if (state.src[state.pos] !== '[') return false;
 
     labelStart = state.pos + 1;
     labelEnd = parseLinkLabel(state, state.pos, true);
 
-    // No closing link label
+    // No closing link label; stop
     if (labelEnd < 0) return false;
 
     // Skip if this is [label](link)
@@ -48,13 +50,17 @@ function createRule(md, projectBaseURL, makeCitationText) {
 
     if (!citeRegex.test(label)) return false;
 
-    let citations = getCitations(label, makeURL);
+    citations = getCitations(label, makeURL);
 
+    // If every citation is not formatted correctly, stop
     if (!citations) return false;
 
+    // Advance state past the opening bracke, up to the last char of the label
     state.pos = labelStart;
     state.posMax = labelEnd;
 
+    // Insert citation tokens for each citation
+    // TODO: maybe be more sophisticated about this?
     citations.forEach(function (citation) {
       var token
 
@@ -66,6 +72,7 @@ function createRule(md, projectBaseURL, makeCitationText) {
       token = state.push('en_cite_close', 'cite', -1);
     });
 
+    // Advance state past the closing ']'
     state.pos = labelEnd + 1;
     state.posMax = max;
   }
@@ -74,6 +81,7 @@ function createRule(md, projectBaseURL, makeCitationText) {
 module.exports = function (md, opts) {
   opts = opts || {};
 
+  // Inserted before link so that there won't be any conflicts
   md.inline.ruler.before(
     'link',
     'en_citations',
