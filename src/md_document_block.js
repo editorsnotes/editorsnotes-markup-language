@@ -18,6 +18,8 @@ module.exports = function (md, opts) {
         let documentURL = getItemURL(opts.projectBaseURL, 'document', match[1])
           , documentText = opts.makeCitationText(documentURL)
 
+        tokens[idx].meta = { enItemType: 'document', enItemID: match[1] }
+
         return '<div class="doc-block"><div class="doc">' + documentText + '</div>';
       } else {
         return '</div>';

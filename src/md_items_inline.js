@@ -17,47 +17,42 @@
 
 const TYPES = require('./types')
 
-function render(tokens, idx) {
-  var token = tokens[idx]
-    , itemType = token.meta.type
-    , href = token.meta.url
-    , rel = 'http://editorsnotes.org/v#' + itemType
-
-  return (
-    '<a ' +
-      'class="en-item en-item-' + itemType + '" ' +
-      'rel="' + rel + '" ' +
-      'href="' + href + '"' +
-    '>' + token.content + '</a>'
-  )
-}
-
 function createRule(md, projectBaseURL, resolveItemText) {
   var getItemURL = require('./get_item_url')
-    , regex = /@@([nt])(\d+)/
+    , regex = /@@([nt])(\d+)/g
 
   function split(text, level, Token) {
     var nodes = []
       , lastPos = 0
 
     text.replace(regex, function (match, type, id, offset) {
+      var itemType = TYPES[type]
+        , url = getItemURL(projectBaseURL, itemType, id)
+        , token
+
       // Add text before the mention
       if (offset > lastPos) {
-        let token = new Token('text', '', 0);
+        token = new Token('text', '', 0);
         token.content = text.slice(lastPos, offset);
         nodes.push(token);
       }
 
-      // Add the mention
-      {
-        let token = new Token('inline_en_ref', '', 0)
-          , itemType = TYPES[type]
-          , url = getItemURL(projectBaseURL, itemType, id)
+      token = new Token('inline_en_ref_open', 'a', 1);
+      token.attrs = [
+        [ 'class', 'en-item en-item-' + itemType ],
+        [ 'rel', 'http://editorsnotes.org/v#' + itemType ],
+        [ 'href', url ]
+      ]
+      nodes.push(token);
 
-        token.content = resolveItemText(itemType, url);
-        token.meta = { url: url, type: itemType }
-        nodes.push(token);
-      }
+
+      token = new Token('text', '', 0);
+      token.content = resolveItemText(itemType, url);
+      token.meta = { enItemType: itemType, enItemID: id }
+      nodes.push(token);
+
+      token = new Token('inline_en_ref_close', 'a', -1);
+      nodes.push(token);
 
       // Move past the last position of the match
       lastPos = offset + match.length;
@@ -112,5 +107,4 @@ module.exports = function (md, opts) {
     'inline_en_ref',
     createRule(md, opts.projectBaseURL, opts.resolveItemText)
   )
-  md.renderer.rules.inline_en_ref = render
 }

@@ -4,12 +4,6 @@ var parseLinkLabel = require('markdown-it/lib/helpers/parse_link_label')
   , citeRegex = /(.* )?@@d(\d+)(, .*)?/
 
 
-function render(tokens, idx) {
-  var token = tokens[idx];
-
-  debugger;
-}
-
 function getCitations(label, makeURL) {
   var citations
 
@@ -30,7 +24,7 @@ function getCitations(label, makeURL) {
     });
 }
 
-function createBlockquoteRule(md, projectBaseURL, makeCitationText) {
+function createBlockquoteRule() {
   return function enBlockquoteCitations(state) {
     var blockTokens = state.tokens
       , currentBlockquote = {}
@@ -50,10 +44,11 @@ function createBlockquoteRule(md, projectBaseURL, makeCitationText) {
       var blockStart = indices[0]
         , blockStop = indices[1]
         , containsClosingCitation
-        , footerOpen
-        , footerClose
 
+      // FIXME figure out the best number on this first check. It should just
+      // prevent things like one line with "> [@@d1]"
       containsClosingCitation = (
+        (blockStop - blockStart) > 3 &&
         blockTokens[blockStop - 3].type === 'paragraph_open' &&
         blockTokens[blockStop - 1].type === 'paragraph_close' &&
         blockTokens[blockStop - 2].type === 'inline' &&
@@ -111,7 +106,6 @@ function createInlineCitationRule(md, projectBaseURL, makeCitationText) {
 
     // Insert citation tokens for each citation
     // TODO: maybe be more sophisticated about this?
-    
     citations.forEach(function (citation) {
       var token
 
@@ -119,6 +113,10 @@ function createInlineCitationRule(md, projectBaseURL, makeCitationText) {
 
       token = state.push('text', '', 0);
       token.content = makeCitationText(citation);
+      token.meta = {
+        enItemType: 'document',
+        enItemID: citation.documentURL.match(/(\d+)\/$/)[1]
+      }
 
       token = state.push('en_cite_close', 'cite', -1);
     });

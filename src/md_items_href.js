@@ -8,13 +8,14 @@ function transformHref(token, makeURL) {
   var hrefIndex
     , relIndex
     , match
+    , linked
 
   for (var i = 0; i < token.attrs.length; i++) {
     if (token.attrs[i][0] === 'href') hrefIndex = i;
     if (token.attrs[i][0] === 'rel') relIndex = i;
   }
 
-  if (hrefIndex === undefined) return;
+  if (hrefIndex === undefined) return null;
 
   match = token.attrs[hrefIndex][1].match(referenceRegex);
 
@@ -31,7 +32,13 @@ function transformHref(token, makeURL) {
     } else {
       token.attrs.push([ 'rel', rel ])
     }
+
+    linked = { enItemType: itemType, enItemID: itemID }
+  } else {
+    linked = null;
   }
+
+  return linked;
 }
 
 function createRule(md, projectBaseURL) {
@@ -40,10 +47,13 @@ function createRule(md, projectBaseURL) {
   return function enItemsHref(state) {
     state.tokens.forEach(function (blockToken) {
       if (blockToken.type === 'inline' && blockToken.children) {
-        blockToken.children.forEach(function (token) {
+        blockToken.children.forEach(function (token, idx) {
           var type = token.type;
           if (type === 'link_open') {
-            transformHref(token, makeURL);
+            let linkedEnItem = transformHref(token, makeURL);
+            if (linkedEnItem) {
+              blockToken.children[idx + 1].meta = linkedEnItem;
+            }
           }
         });
       }
