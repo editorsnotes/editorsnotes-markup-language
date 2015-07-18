@@ -4,6 +4,12 @@ var parseLinkLabel = require('markdown-it/lib/helpers/parse_link_label')
   , citeRegex = /(.* )?@@d(\d+)(, .*)?/
 
 
+function render(tokens, idx) {
+  var token = tokens[idx];
+
+  debugger;
+}
+
 function getCitations(label, makeURL) {
   var citations
 
@@ -24,10 +30,54 @@ function getCitations(label, makeURL) {
     });
 }
 
-function createRule(md, projectBaseURL, makeCitationText) {
+function createBlockquoteRule(md, projectBaseURL, makeCitationText) {
+  return function enBlockquoteCitations(state) {
+    var blockTokens = state.tokens
+      , currentBlockquote = {}
+      , blockquotes = []
+
+    blockTokens.forEach(function (token, idx) {
+      if (token.type === 'blockquote_open') {
+        currentBlockquote[token.level] = idx;
+      }
+
+      if (token.type === 'blockquote_close') {
+        blockquotes.push([currentBlockquote[token.level], idx]);
+      }
+    });
+
+    blockquotes.forEach(function (indices) {
+      var blockStart = indices[0]
+        , blockStop = indices[1]
+        , containsClosingCitation
+        , footerOpen
+        , footerClose
+
+      containsClosingCitation = (
+        blockTokens[blockStop - 3].type === 'paragraph_open' &&
+        blockTokens[blockStop - 1].type === 'paragraph_close' &&
+        blockTokens[blockStop - 2].type === 'inline' &&
+        blockTokens[blockStop - 2].children &&
+        blockTokens[blockStop - 2].children.length === 3 &&
+        blockTokens[blockStop - 2].children[0].type === 'en_cite_open' &&
+        blockTokens[blockStop - 2].children[1].type === 'text' &&
+        blockTokens[blockStop - 2].children[2].type === 'en_cite_close'
+      );
+
+      if (!containsClosingCitation) return;
+
+      blockTokens[blockStop - 3].type = 'blockquote_citation_footer_open';
+      blockTokens[blockStop - 3].tag = 'footer';
+      blockTokens[blockStop - 1].type = 'blockquote_citation_footer_close';
+      blockTokens[blockStop - 1].tag = 'footer';
+    });
+  }
+}
+
+function createInlineCitationRule(md, projectBaseURL, makeCitationText) {
   var makeURL = require('./get_item_url').bind(null, projectBaseURL, 'document')
 
-  return function enCitations(state) {
+  return function enInlineCitations(state) {
     var max = state.posMax
       , labelStart
       , labelEnd
@@ -61,6 +111,7 @@ function createRule(md, projectBaseURL, makeCitationText) {
 
     // Insert citation tokens for each citation
     // TODO: maybe be more sophisticated about this?
+    
     citations.forEach(function (citation) {
       var token
 
@@ -74,7 +125,8 @@ function createRule(md, projectBaseURL, makeCitationText) {
 
     // Advance state past the closing ']'
     state.pos = labelEnd + 1;
-    state.posMax = max;
+    state.posMax = max + 1;
+    return true;
   }
 }
 
@@ -84,7 +136,12 @@ module.exports = function (md, opts) {
   // Inserted before link so that there won't be any conflicts
   md.inline.ruler.before(
     'link',
-    'en_citations',
-    createRule(md, opts.projectBaseURL, opts.makeCitationText)
+    'en_inline_citations',
+    createInlineCitationRule(md, opts.projectBaseURL, opts.makeCitationText)
+  );
+
+  md.core.ruler.push(
+    'en_blockquote_citations',
+    createBlockquoteRule(md, opts.projectBaseURL, opts.makeCitationText)
   )
 }

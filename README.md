@@ -39,11 +39,23 @@ Links to topics, documents, and notes can also be added to arbitrary text by
 including the `@@` syntax as link href values. For example, `[some text](@@d1)`
 would include a link to the document with ID 1.
 
-## Fenced blocks for extended commentary on documents
-
-## Footnotes
-
 ## Citations
+Documents can be cited with the same syntax as used in [Pandoc]. To cite a
+document within body text, use the format
+
+    `[(optional prefix )@@d(DOCUMENT_ID)(, optional locator)]`
+
+## Blockquote attribution
+Blockquotes can be attributed to a certain source by using the citation syntax
+in the final line of the blockquote. For example:
+
+```
+> The whole life of those societies in which modern conditions of production
+> prevail presents itself as an immense accumulation of _spectacles_. All that
+> once was directly lived has become mere representation.
+>
+> [@@d40, p.12]
+```
 
 # Testing
   * `npm install`

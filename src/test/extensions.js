@@ -56,7 +56,7 @@ test('Citations', function (t) {
   var citationPlugin = require('../md_citations')
     , parser
 
-  t.plan(1);
+  t.plan(3);
 
   parser = require('markdown-it')().use(citationPlugin, {
     projectBaseURL: '/projects/emma/',
@@ -68,7 +68,35 @@ test('Citations', function (t) {
   t.equal(
     parser.render('This claim needs a citation [see @@d1, page 1], I think.').trim(),
     '<p>This claim needs a citation <cite>see /projects/emma/documents/1/, page 1</cite>, I think.</p>'
-  )
+  );
+
+  t.equal(
+    parser.render('should work at EOL [see @@d1, page 1]').trim(),
+    '<p>should work at EOL <cite>see /projects/emma/documents/1/, page 1</cite></p>'
+  );
+
+  var testText = `
+See Suzanne Briet's comment that
+
+> [the] conditions and the tools of mental work today are very
+> different from what they previously were
+>
+> [@@d1, p.13]
+
+(end)
+`.trim()
+
+  var expectedHTML = `
+<p>See Suzanne Briet's comment that</p>
+<blockquote>
+<p>[the] conditions and the tools of mental work today are very
+different from what they previously were</p>
+<footer><cite>/projects/emma/documents/1/, p.13</cite></footer>
+</blockquote>
+<p>(end)</p>
+`.trim()
+
+  t.equal(parser.render(testText).trim(), expectedHTML);
 });
 
 test('Document block', function (t) {
