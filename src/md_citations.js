@@ -61,6 +61,9 @@ function createBlockquoteRule() {
 
       if (!containsClosingCitation) return;
 
+      // FIXME: should state.parentType be changed? It's not documented
+      // anywhere but it seems like markdown-it block parsers normally
+      // do that.
       blockTokens[blockStop - 3].type = 'blockquote_citation_footer_open';
       blockTokens[blockStop - 3].tag = 'footer';
       blockTokens[blockStop - 1].type = 'blockquote_citation_footer_close';
