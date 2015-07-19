@@ -10,13 +10,16 @@ function createRule(md, projectBaseURL, makeCitationText) {
     blockTokens.forEach(function (token) {
       if (token.type === 'container_document_open') {
         let match = token.info.trim().match(regex)
-          , documentURL = getItemURL(projectBaseURL, 'document', match[1])
-          , documentText = makeCitationText(documentURL)
+          , id = match[1]
+          , url = getItemURL(projectBaseURL, 'document', id)
+          , citation = { id, url }
+          , documentText = makeCitationText(citation, false)
 
         token.meta = {
           enCitationText: documentText,
           enItemType: 'document',
-          enItemID: match[1]
+          enItemID: id,
+          enItemURL: url
         }
       }
     })

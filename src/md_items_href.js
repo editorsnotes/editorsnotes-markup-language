@@ -22,9 +22,10 @@ function transformHref(token, makeURL) {
   if (match) {
     let itemType = TYPES[match[1]]
       , itemID = match[2]
+      , itemURL = makeURL(itemType, itemID)
       , rel = 'http://editorsnotes.org/v#' + itemType
 
-    token.attrs[hrefIndex][1] = makeURL(itemType, itemID);
+    token.attrs[hrefIndex][1] = itemURL
 
     if (relIndex !== undefined) {
       let oldRel = token.attrs[relIndex][1];
@@ -33,7 +34,11 @@ function transformHref(token, makeURL) {
       token.attrs.push([ 'rel', rel ])
     }
 
-    linked = { enItemType: itemType, enItemID: itemID }
+    linked = {
+      enItemType: itemType,
+      enItemID: itemID,
+      enItemURL: itemURL
+    }
   } else {
     linked = null;
   }

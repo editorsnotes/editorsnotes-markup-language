@@ -8,8 +8,8 @@ test('Inline item links', function (t) {
 
   parser = require('markdown-it')().use(inlinePlugin, {
     projectBaseURL: '/projects/emma/',
-    resolveItemText: function (type, url) {
-      return type + ' ' + url.match(/\d+/)[0]
+    resolveItemText: function (type, id, url) {
+      return type + ' ' + id;
     }
   });
 
@@ -61,7 +61,7 @@ test('Citations', function (t) {
   parser = require('markdown-it')().use(citationPlugin, {
     projectBaseURL: '/projects/emma/',
     makeCitationText: function (cite) {
-      return (cite.prefix || '') + cite.documentURL + (cite.locator || '');
+      return (cite.prefix || '') + cite.url + (cite.locator || '');
     }
   });
 
@@ -107,8 +107,8 @@ test('Document block', function (t) {
 
   parser = require('markdown-it')().use(documentBlockPlugin, {
     projectBaseURL: '/projects/emma/',
-    makeCitationText: function (documentURL) {
-      return 'Document #' + documentURL.match(/\d+/)[0];
+    makeCitationText: function (cite) {
+      return 'Document #' + cite.id;
     }
   });
 

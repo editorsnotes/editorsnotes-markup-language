@@ -17,10 +17,11 @@ function getCitations(label, makeURL) {
   return citations
     .map(function (match) {
       var prefix = match[1]
-        , documentURL = makeURL(match[2])
+        , id = match[2]
+        , url = makeURL(id)
         , locator = match[3]
 
-      return { prefix, documentURL, locator }
+      return { prefix, id, url, locator }
     });
 }
 
@@ -115,10 +116,11 @@ function createInlineCitationRule(md, projectBaseURL, makeCitationText) {
       token = state.push('en_cite_open', 'cite', 1);
 
       token = state.push('text', '', 0);
-      token.content = makeCitationText(citation);
+      token.content = makeCitationText(citation, true);
       token.meta = {
         enItemType: 'document',
-        enItemID: citation.documentURL.match(/(\d+)\/$/)[1]
+        enItemID: citation.id,
+        enItemURL: citation.url
       }
 
       token = state.push('en_cite_close', 'cite', -1);

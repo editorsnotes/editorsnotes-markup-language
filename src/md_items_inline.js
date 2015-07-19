@@ -47,8 +47,12 @@ function createRule(md, projectBaseURL, resolveItemText) {
 
 
       token = new Token('text', '', 0);
-      token.content = resolveItemText(itemType, url);
-      token.meta = { enItemType: itemType, enItemID: id }
+      token.content = resolveItemText(itemType, id, url);
+      token.meta = {
+        enItemType: itemType,
+        enItemID: id,
+        enItemURL: url
+      }
       nodes.push(token);
 
       token = new Token('inline_en_ref_close', 'a', -1);
