@@ -1,6 +1,6 @@
 {
   "name": "editorsnotes-markup-parser",
-  "version": "0.5.1",
+  "version": "1.0.0",
   "license": "AGPL-3.0",
   "author": "Patrick Golden",
   "description": "Parser for Editors' Notes markup language",
