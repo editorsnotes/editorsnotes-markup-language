@@ -4,6 +4,9 @@
   "author": "Patrick Golden",
   "description": "Parser for Editors' Notes markup language",
   "main": "lib/index.js",
+  "bin": {
+    "editorsnotes_markup_serve": "./bin/serve"
+  },
   "scripts": {
     "compile": "rm -rf lib && babel src --out-dir lib",
     "prepublish": "npm run compile",
@@ -15,8 +18,11 @@
     "url": "https://github.com/editorsnotes/editorsnotes-markup-language.git"
   },
   "dependencies": {
+    "body": "^5.1.0",
     "markdown-it": "^4.3.1",
-    "markdown-it-container": "^1.0.0"
+    "markdown-it-container": "^1.0.0",
+    "optimist": "^0.6.1",
+    "routes": "^2.1.0"
   },
   "devDependencies": {
     "babel": "^6.1.3",
