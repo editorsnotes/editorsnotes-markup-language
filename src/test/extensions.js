@@ -56,12 +56,14 @@ test('Citations', function (t) {
   var citationPlugin = require('../md_citations')
     , parser
 
-  t.plan(3);
+  t.plan(4);
 
   parser = require('markdown-it')().use(citationPlugin, {
     projectBaseURL: '/projects/emma/',
-    makeCitationText: function (cite) {
-      return (cite.prefix || '') + cite.url + (cite.locator || '');
+    makeCitationText: function (cites) {
+      return cites.map(function (cite) {
+        return ((cite.prefix || '') + cite.url + (cite.locator || '')).trim();
+      }).join('; ');
     }
   });
 
@@ -73,6 +75,11 @@ test('Citations', function (t) {
   t.equal(
     parser.render('should work at EOL [see @@d1, page 1]').trim(),
     '<p>should work at EOL <cite>see /projects/emma/documents/1/, page 1</cite></p>'
+  );
+
+  t.equal(
+    parser.render('should work at EOL [@@d1; @@d2]').trim(),
+    '<p>should work at EOL <cite>/projects/emma/documents/1/; /projects/emma/documents/2/</cite></p>'
   );
 
   var testText = `
@@ -107,8 +114,8 @@ test('Document block', function (t) {
 
   parser = require('markdown-it')().use(documentBlockPlugin, {
     projectBaseURL: '/projects/emma/',
-    makeCitationText: function (cite) {
-      return 'Document #' + cite.id;
+    makeCitationText: function (cites) {
+      return 'Document #' + cites[0].id;
     }
   });
 

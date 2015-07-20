@@ -13,7 +13,7 @@ function createRule(md, projectBaseURL, makeCitationText) {
           , id = match[1]
           , url = getItemURL(projectBaseURL, 'document', id)
           , citation = { id, url }
-          , documentText = makeCitationText(citation, false)
+          , documentText = makeCitationText([citation], false)
 
         token.meta = {
           enCitationText: documentText,

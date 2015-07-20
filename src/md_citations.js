@@ -82,6 +82,7 @@ function createInlineCitationRule(md, projectBaseURL, makeCitationText) {
       , labelEnd
       , label
       , citations
+      , token
 
     // Continue only if starting with a link label
     if (state.src[state.pos] !== '[') return false;
@@ -110,21 +111,13 @@ function createInlineCitationRule(md, projectBaseURL, makeCitationText) {
 
     // Insert citation tokens for each citation
     // TODO: maybe be more sophisticated about this?
-    citations.forEach(function (citation) {
-      var token
+    token = state.push('en_cite_open', 'cite', 1);
+    token.meta = { citations }
 
-      token = state.push('en_cite_open', 'cite', 1);
+    token = state.push('text', '', 0);
+    token.content = makeCitationText(citations, true);
 
-      token = state.push('text', '', 0);
-      token.content = makeCitationText(citation, true);
-      token.meta = {
-        enItemType: 'document',
-        enItemID: citation.id,
-        enItemURL: citation.url
-      }
-
-      token = state.push('en_cite_close', 'cite', -1);
-    });
+    token = state.push('en_cite_close', 'cite', -1);
 
     // Advance state past the closing ']'
     state.pos = labelEnd + 1;
