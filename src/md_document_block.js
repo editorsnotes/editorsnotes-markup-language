@@ -3,7 +3,7 @@
 var getItemURL = require('./get_item_url')
   , regex = /^document (\d+)$/
 
-function createRule(md, projectBaseURL, makeCitationText) {
+function createRule(md, projectBaseURL, makeBibliographyEntry) {
   return function enDocumentBlockMetaRule(state) {
     var blockTokens = state.tokens
 
@@ -13,7 +13,7 @@ function createRule(md, projectBaseURL, makeCitationText) {
           , id = match[1]
           , url = getItemURL(projectBaseURL, 'document', id)
           , citation = { id, url }
-          , documentText = makeCitationText([citation], false)
+          , documentText = makeBibliographyEntry(citation, false)
 
         token.meta = {
           enCitationText: documentText,
@@ -45,6 +45,6 @@ module.exports = function (md, opts) {
 
   md.core.ruler.push(
     'en_document_block_meta',
-    createRule(md, opts.projectBaseURL, opts.makeCitationText)
+    createRule(md, opts.projectBaseURL, opts.makeBibliographyEntry)
   )
 }

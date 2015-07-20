@@ -54,10 +54,12 @@ function createBlockquoteRule() {
         blockTokens[blockStop - 1].type === 'paragraph_close' &&
         blockTokens[blockStop - 2].type === 'inline' &&
         blockTokens[blockStop - 2].children &&
-        blockTokens[blockStop - 2].children.length === 3 &&
-        blockTokens[blockStop - 2].children[0].type === 'en_cite_open' &&
-        blockTokens[blockStop - 2].children[1].type === 'text' &&
-        blockTokens[blockStop - 2].children[2].type === 'en_cite_close'
+        blockTokens[blockStop - 2].children.length === 5 &&
+        blockTokens[blockStop - 2].children[0].type === 'en_cite_section_open' &&
+        blockTokens[blockStop - 2].children[1].type === 'en_cite_open' &&
+        blockTokens[blockStop - 2].children[2].type === 'text' &&
+        blockTokens[blockStop - 2].children[3].type === 'en_cite_close' &&
+        blockTokens[blockStop - 2].children[4].type === 'en_cite_section_close'
       );
 
       if (!containsClosingCitation) return;
@@ -73,7 +75,7 @@ function createBlockquoteRule() {
   }
 }
 
-function createInlineCitationRule(md, projectBaseURL, makeCitationText) {
+function createInlineCitationRule(md, projectBaseURL, makeInlineCitation) {
   var makeURL = require('./get_item_url').bind(null, projectBaseURL, 'document')
 
   return function enInlineCitations(state) {
@@ -82,6 +84,7 @@ function createInlineCitationRule(md, projectBaseURL, makeCitationText) {
       , labelEnd
       , label
       , citations
+      , inlineCitation
       , token
 
     // Continue only if starting with a link label
@@ -105,19 +108,53 @@ function createInlineCitationRule(md, projectBaseURL, makeCitationText) {
     // If every citation is not formatted correctly, stop
     if (!citations) return false;
 
+    inlineCitation = makeInlineCitation(citations);
+
     // Advance state past the opening bracke, up to the last char of the label
     state.pos = labelStart;
     state.posMax = labelEnd;
 
     // Insert citation tokens for each citation
     // TODO: maybe be more sophisticated about this?
-    token = state.push('en_cite_open', 'cite', 1);
+    token = state.push('en_cite_section_open', 'cite', 1);
     token.meta = { citations }
 
-    token = state.push('text', '', 0);
-    token.content = makeCitationText(citations, true);
+    if (inlineCitation.prefix) {
+      token = state.push('text', '', 0);
+      token.content = inlineCitation.prefix;
+    }
 
-    token = state.push('en_cite_close', 'cite', -1);
+    inlineCitation.citations.forEach(function (citeText, idx) {
+      token = state.push('en_cite_open', 'a', 1);
+      token.attrs = [
+        [ 'rel', 'http://editorsnotes.org/v#document' ],
+        [ 'href', citations[idx].url ]
+      ];
+
+      token.meta = {
+        enItemType: 'document',
+        enItemID: citations[idx].id,
+        enItemURL: citations[idx].url,
+      }
+
+      token = state.push('text', '', 0);
+      token.content = citeText.trim();
+
+      token = state.push('en_cite_close', 'a', -1);
+
+      if (idx < citations.length - 1) {
+        token = state.push('text', '', 0);
+        token.content = inlineCitation.delimiter;
+      }
+    });
+
+    if (inlineCitation.suffix) {
+      token = state.push('text', '', 0);
+      token.content = inlineCitation.suffix;
+    }
+
+
+    token = state.push('en_cite_section_close', 'cite', -1);
 
     // Advance state past the closing ']'
     state.pos = labelEnd + 1;
@@ -133,11 +170,11 @@ module.exports = function (md, opts) {
   md.inline.ruler.before(
     'link',
     'en_inline_citations',
-    createInlineCitationRule(md, opts.projectBaseURL, opts.makeCitationText)
+    createInlineCitationRule(md, opts.projectBaseURL, opts.makeInlineCitation)
   );
 
   md.core.ruler.push(
     'en_blockquote_citations',
-    createBlockquoteRule(md, opts.projectBaseURL, opts.makeCitationText)
+    createBlockquoteRule(md, opts.projectBaseURL, opts.makeInlineCitation)
   )
 }

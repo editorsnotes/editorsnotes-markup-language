@@ -10,7 +10,8 @@ module.exports = function (opts) {
 
   if (!opts.projectBaseURL) throw Error("Must pass projectBaseURL");
   if (!opts.resolveItemText) throw Error("Must pass resolveItemText");
-  if (!opts.makeCitationText) throw Error("Must pass makeCitationText");
+  if (!opts.makeInlineCitation) throw Error("Must pass makeInlineCitation");
+  if (!opts.makeBibliographyEntry) throw Error("Must pass makeBibliographyEntry");
 
   return require('markdown-it')()
     .use(inlinePlugin, {
@@ -22,10 +23,10 @@ module.exports = function (opts) {
     })
     .use(citationPlugin, {
       projectBaseURL: opts.projectBaseURL,
-      makeCitationText: opts.makeCitationText
+      makeInlineCitation: opts.makeInlineCitation
     })
     .use(documentBlockPlugin, {
       projectBaseURL: opts.projectBaseURL,
-      makeCitationText: opts.makeCitationText
+      makeBibliographyEntry: opts.makeBibliographyEntry
     })
 }

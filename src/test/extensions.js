@@ -60,26 +60,42 @@ test('Citations', function (t) {
 
   parser = require('markdown-it')().use(citationPlugin, {
     projectBaseURL: '/projects/emma/',
-    makeCitationText: function (cites) {
-      return cites.map(function (cite) {
-        return ((cite.prefix || '') + cite.url + (cite.locator || '')).trim();
-      }).join('; ');
+    makeInlineCitation: function (cites) {
+      return {
+        delimiter: '; ',
+        citations: cites.map(function (cite) {
+          return (cite.prefix || '') + cite.url + (cite.locator || '');
+        })
+      }
     }
   });
 
   t.equal(
     parser.render('This claim needs a citation [see @@d1, page 1], I think.').trim(),
-    '<p>This claim needs a citation <cite>see /projects/emma/documents/1/, page 1</cite>, I think.</p>'
+    '<p>This claim needs a citation <cite>' +
+    '<a rel="http://editorsnotes.org/v#document" href="/projects/emma/documents/1/">' +
+    'see /projects/emma/documents/1/, page 1' +
+    '</a></cite>, I think.</p>'
   );
 
   t.equal(
     parser.render('should work at EOL [see @@d1, page 1]').trim(),
-    '<p>should work at EOL <cite>see /projects/emma/documents/1/, page 1</cite></p>'
+    '<p>should work at EOL <cite>' +
+    '<a rel="http://editorsnotes.org/v#document" href="/projects/emma/documents/1/">' +
+    'see /projects/emma/documents/1/, page 1' +
+    '</a></cite></p>'
   );
 
   t.equal(
     parser.render('should work at EOL [@@d1; @@d2]').trim(),
-    '<p>should work at EOL <cite>/projects/emma/documents/1/; /projects/emma/documents/2/</cite></p>'
+    '<p>should work at EOL <cite>' +
+      '<a rel="http://editorsnotes.org/v#document" href="/projects/emma/documents/1/">' +
+        '/projects/emma/documents/1/' +
+      '</a>; ' +
+      '<a rel="http://editorsnotes.org/v#document" href="/projects/emma/documents/2/">' +
+        '/projects/emma/documents/2/' +
+      '</a>' +
+    '</cite></p>'
   );
 
   var testText = `
@@ -93,15 +109,16 @@ See Suzanne Briet's comment that
 (end)
 `.trim()
 
-  var expectedHTML = `
+  var expectedHTML = (`
 <p>See Suzanne Briet's comment that</p>
 <blockquote>
 <p>[the] conditions and the tools of mental work today are very
 different from what they previously were</p>
-<footer><cite>/projects/emma/documents/1/, p.13</cite></footer>
+<footer><cite><a rel="http://editorsnotes.org/v#document" href="/projects/emma/documents/1/">` +
+`/projects/emma/documents/1/, p.13</a></cite></footer>
 </blockquote>
 <p>(end)</p>
-`.trim()
+`).trim()
 
   t.equal(parser.render(testText).trim(), expectedHTML);
 });
@@ -114,8 +131,8 @@ test('Document block', function (t) {
 
   parser = require('markdown-it')().use(documentBlockPlugin, {
     projectBaseURL: '/projects/emma/',
-    makeCitationText: function (cites) {
-      return 'Document #' + cites[0].id;
+    makeBibliographyEntry: function (cite) {
+      return 'Document #' + cite.id;
     }
   });
 
