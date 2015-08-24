@@ -36,9 +36,16 @@ module.exports = function (md, opts) {
     },
     render: function (tokens, idx) {
       if (tokens[idx].nesting === 1) {
-        return '<div class="doc-block"><div class="doc">' + tokens[idx].meta.enCitationText + '</div>';
+        return (
+          '<section class="document-block">' +
+            '<div>' +
+              '<a rel="http://editorsnotes.org/v#document" href="' + tokens[idx].meta.enItemURL + '">' +
+              tokens[idx].meta.enCitationText +
+              '</a>' +
+            '</div>'
+        )
       } else {
-        return '</div>';
+        return '</section>';
       }
     }
   });

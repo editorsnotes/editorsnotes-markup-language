@@ -39,7 +39,6 @@ function createRule(md, projectBaseURL, resolveItemText) {
 
       token = new Token('inline_en_ref_open', 'a', 1);
       token.attrs = [
-        [ 'class', 'en-item en-item-' + itemType ],
         [ 'rel', 'http://editorsnotes.org/v#' + itemType ],
         [ 'href', url ]
       ]

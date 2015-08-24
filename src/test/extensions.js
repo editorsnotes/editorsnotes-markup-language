@@ -17,12 +17,12 @@ test('Inline item links', function (t) {
 
   t.equal(
     parser.render('mentioning @@t123').trim(),
-    '<p>mentioning <a class="en-item en-item-topic" rel="http://editorsnotes.org/v#topic" href="/projects/emma/topics/123/">topic 123</a></p>'
+    '<p>mentioning <a rel="http://editorsnotes.org/v#topic" href="/projects/emma/topics/123/">topic 123</a></p>'
   )
 
   t.equal(
     parser.render('mentioning @@n456!').trim(),
-    '<p>mentioning <a class="en-item en-item-note" rel="http://editorsnotes.org/v#note" href="/projects/emma/notes/456/">note 456</a>!</p>'
+    '<p>mentioning <a rel="http://editorsnotes.org/v#note" href="/projects/emma/notes/456/">note 456</a>!</p>'
   )
 });
 
@@ -139,8 +139,10 @@ test('Document block', function (t) {
   t.equal(
     parser.render('::: document 1\nThis is in the document block.\n:::\nThis is not.').trim(),
     (
-      '<div class="doc-block"><div class="doc">Document #1</div>' +
-      '<p>This is in the document block.</p>\n</div><p>This is not.</p>'
+      '<section class="document-block"><div>' +
+      '<a rel="http://editorsnotes.org/v#document" href="/projects/emma/documents/1/">Document #1</a>' +
+      '</div>' +
+      '<p>This is in the document block.</p>\n</section><p>This is not.</p>'
     )
   )
 });
