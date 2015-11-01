@@ -27,7 +27,7 @@ would result in the html:
 ```
   <p>
     In a contentions election, 
-    <a href="/projects/p/topics/140/" rel="topic">
+    <a href="/projects/p/topics/140/" class="ENInlineReference ENInlineReference-topic">
       Woodrow Wilson
     </a>
     was elected president in 1912.
