@@ -128,7 +128,7 @@ function createInlineCitationRule(md, projectBaseURL, makeInlineCitation) {
       token = state.push('en_cite_open', 'a', 1);
       token.attrs = [
         [ 'href', citations[idx].url ],
-        [ 'class', 'InlineReference InlineReference-document' ]
+        [ 'class', 'ENInlineReference ENInlineReference-document' ]
       ];
 
       token.meta = {

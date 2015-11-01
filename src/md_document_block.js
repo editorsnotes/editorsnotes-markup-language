@@ -37,9 +37,9 @@ module.exports = function (md, opts) {
     render: function (tokens, idx) {
       if (tokens[idx].nesting === 1) {
         return (
-          '<section class="DocumentBlock">' +
+          '<section class="ENDocumentBlock">' +
             '<div>' +
-              '<a href="' + tokens[idx].meta.enItemURL + '" class="DocumentBlock--Citation">' +
+              '<a href="' + tokens[idx].meta.enItemURL + '" class="ENDocumentBlock--Citation">' +
               tokens[idx].meta.enCitationText +
               '</a>' +
             '</div>'

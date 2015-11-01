@@ -23,7 +23,7 @@ function transformHref(token, makeURL) {
     let itemType = TYPES[match[1]]
       , itemID = match[2]
       , itemURL = makeURL(itemType, itemID)
-      , className = 'InlineReference InlineReference-' + itemType
+      , className = 'ENInlineReference ENInlineReference-' + itemType
 
     token.attrs[hrefIndex][1] = itemURL
 

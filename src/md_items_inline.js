@@ -40,7 +40,7 @@ function createRule(md, projectBaseURL, resolveItemText) {
       token = new Token('inline_en_ref_open', 'a', 1);
       token.attrs = [
         [ 'href', url ],
-        [ 'class', 'InlineReference InlineReference-' + itemType ],
+        [ 'class', 'ENInlineReference ENInlineReference-' + itemType ],
       ]
       nodes.push(token);
 

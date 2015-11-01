@@ -17,12 +17,12 @@ test('Inline item links', function (t) {
 
   t.equal(
     parser.render('mentioning @@t123').trim(),
-    '<p>mentioning <a href="/projects/emma/topics/123/" class="InlineReference InlineReference-topic">topic 123</a></p>'
+    '<p>mentioning <a href="/projects/emma/topics/123/" class="ENInlineReference ENInlineReference-topic">topic 123</a></p>'
   )
 
   t.equal(
     parser.render('mentioning @@n456!').trim(),
-    '<p>mentioning <a href="/projects/emma/notes/456/" class="InlineReference InlineReference-note">note 456</a>!</p>'
+    '<p>mentioning <a href="/projects/emma/notes/456/" class="ENInlineReference ENInlineReference-note">note 456</a>!</p>'
   )
 });
 
@@ -38,17 +38,17 @@ test('Items as hrefs', function (t) {
 
   t.equal(
     parser.render('This is a link to [a topic](@@t500).').trim(),
-    '<p>This is a link to <a href="/projects/emma/topics/500/" class="InlineReference InlineReference-topic">a topic</a>.</p>'
+    '<p>This is a link to <a href="/projects/emma/topics/500/" class="ENInlineReference ENInlineReference-topic">a topic</a>.</p>'
   )
 
   t.equal(
     parser.render('This is a link to [a note](@@n365).').trim(),
-    '<p>This is a link to <a href="/projects/emma/notes/365/" class="InlineReference InlineReference-note">a note</a>.</p>'
+    '<p>This is a link to <a href="/projects/emma/notes/365/" class="ENInlineReference ENInlineReference-note">a note</a>.</p>'
   )
 
   t.equal(
     parser.render('This is a link to [a document](@@d7).').trim(),
-    '<p>This is a link to <a href="/projects/emma/documents/7/" class="InlineReference InlineReference-document">a document</a>.</p>'
+    '<p>This is a link to <a href="/projects/emma/documents/7/" class="ENInlineReference ENInlineReference-document">a document</a>.</p>'
   )
 });
 
@@ -73,7 +73,7 @@ test('Citations', function (t) {
   t.equal(
     parser.render('This claim needs a citation [see @@d1, page 1], I think.').trim(),
     '<p>This claim needs a citation <cite>' +
-    '<a href="/projects/emma/documents/1/" class="InlineReference InlineReference-document">' +
+    '<a href="/projects/emma/documents/1/" class="ENInlineReference ENInlineReference-document">' +
     'see /projects/emma/documents/1/, page 1' +
     '</a></cite>, I think.</p>'
   );
@@ -81,7 +81,7 @@ test('Citations', function (t) {
   t.equal(
     parser.render('should work at EOL [see @@d1, page 1]').trim(),
     '<p>should work at EOL <cite>' +
-    '<a href="/projects/emma/documents/1/" class="InlineReference InlineReference-document">' +
+    '<a href="/projects/emma/documents/1/" class="ENInlineReference ENInlineReference-document">' +
     'see /projects/emma/documents/1/, page 1' +
     '</a></cite></p>'
   );
@@ -89,10 +89,10 @@ test('Citations', function (t) {
   t.equal(
     parser.render('should work at EOL [@@d1; @@d2]').trim(),
     '<p>should work at EOL <cite>' +
-      '<a href="/projects/emma/documents/1/" class="InlineReference InlineReference-document">' +
+      '<a href="/projects/emma/documents/1/" class="ENInlineReference ENInlineReference-document">' +
         '/projects/emma/documents/1/' +
       '</a>; ' +
-      '<a href="/projects/emma/documents/2/" class="InlineReference InlineReference-document">' +
+      '<a href="/projects/emma/documents/2/" class="ENInlineReference ENInlineReference-document">' +
         '/projects/emma/documents/2/' +
       '</a>' +
     '</cite></p>'
@@ -114,7 +114,7 @@ See Suzanne Briet's comment that
 <blockquote>
 <p>[the] conditions and the tools of mental work today are very
 different from what they previously were</p>
-<footer><cite><a href="/projects/emma/documents/1/" class="InlineReference InlineReference-document">` +
+<footer><cite><a href="/projects/emma/documents/1/" class="ENInlineReference ENInlineReference-document">` +
 `/projects/emma/documents/1/, p.13</a></cite></footer>
 </blockquote>
 <p>(end)</p>
@@ -139,8 +139,8 @@ test('Document block', function (t) {
   t.equal(
     parser.render('::: document @@d1\nThis is in the document block.\n:::\nThis is not.').trim(),
     (
-      '<section class="DocumentBlock"><div>' +
-      '<a href="/projects/emma/documents/1/" class="DocumentBlock--Citation">Document #1</a>' +
+      '<section class="ENDocumentBlock"><div>' +
+      '<a href="/projects/emma/documents/1/" class="ENDocumentBlock--Citation">Document #1</a>' +
       '</div>' +
       '<p>This is in the document block.</p>\n</section><p>This is not.</p>'
     )
