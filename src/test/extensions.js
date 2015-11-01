@@ -22,7 +22,7 @@ test('Inline item links', function (t) {
 
   t.equal(
     parser.render('mentioning @@n456!').trim(),
-    '<p>mentioning <a href="/projects/emma/notes/456/" class="InlineReference InlineReference-topic">note 456</a>!</p>'
+    '<p>mentioning <a href="/projects/emma/notes/456/" class="InlineReference InlineReference-note">note 456</a>!</p>'
   )
 });
 
@@ -140,7 +140,7 @@ test('Document block', function (t) {
     parser.render('::: document 1\nThis is in the document block.\n:::\nThis is not.').trim(),
     (
       '<section class="CitationBlock"><div>' +
-      '<a class="CitationBlock--Citation" href="/projects/emma/documents/1/">Document #1</a>' +
+      '<a href="/projects/emma/documents/1/" class="CitationBlock--Citation">Document #1</a>' +
       '</div>' +
       '<p>This is in the document block.</p>\n</section><p>This is not.</p>'
     )

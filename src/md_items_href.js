@@ -6,13 +6,13 @@ const TYPES = require('./types')
 
 function transformHref(token, makeURL) {
   var hrefIndex
-    , relIndex
+    , classIndex
     , match
     , linked
 
   for (var i = 0; i < token.attrs.length; i++) {
     if (token.attrs[i][0] === 'href') hrefIndex = i;
-    if (token.attrs[i][0] === 'rel') relIndex = i;
+    if (token.attrs[i][0] === 'class') classIndex = i;
   }
 
   if (hrefIndex === undefined) return null;
@@ -23,15 +23,15 @@ function transformHref(token, makeURL) {
     let itemType = TYPES[match[1]]
       , itemID = match[2]
       , itemURL = makeURL(itemType, itemID)
-      , rel = 'http://editorsnotes.org/v#' + itemType
+      , className = 'InlineReference InlineReference-' + itemType
 
     token.attrs[hrefIndex][1] = itemURL
 
-    if (relIndex !== undefined) {
-      let oldRel = token.attrs[relIndex][1];
-      token.attrs[relIndex][1] = oldRel + ' ' + rel;
+    if (classIndex !== undefined) {
+      let oldClass = token.attrs[classIndex][1];
+      token.attrs[classIndex][1] = oldClass + ' ' + className
     } else {
-      token.attrs.push([ 'rel', rel ])
+      token.attrs.push([ 'class', className ])
     }
 
     linked = {

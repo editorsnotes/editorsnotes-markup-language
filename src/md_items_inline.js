@@ -39,8 +39,8 @@ function createRule(md, projectBaseURL, resolveItemText) {
 
       token = new Token('inline_en_ref_open', 'a', 1);
       token.attrs = [
-        [ 'rel', 'http://editorsnotes.org/v#' + itemType ],
-        [ 'href', url ]
+        [ 'href', url ],
+        [ 'class', 'InlineReference InlineReference-' + itemType ],
       ]
       nodes.push(token);
 

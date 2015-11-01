@@ -127,8 +127,8 @@ function createInlineCitationRule(md, projectBaseURL, makeInlineCitation) {
     inlineCitation.citations.forEach(function (citeText, idx) {
       token = state.push('en_cite_open', 'a', 1);
       token.attrs = [
-        [ 'rel', 'http://editorsnotes.org/v#document' ],
-        [ 'href', citations[idx].url ]
+        [ 'href', citations[idx].url ],
+        [ 'class', 'InlineReference InlineReference-document' ]
       ];
 
       token.meta = {
