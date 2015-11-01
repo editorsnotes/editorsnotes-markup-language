@@ -1,7 +1,7 @@
 "use strict";
 
 var getItemURL = require('./get_item_url')
-  , regex = /^document (\d+)$/
+  , regex = /^document @@d(\d+)$/
 
 function createRule(md, projectBaseURL, makeBibliographyEntry) {
   return function enDocumentBlockMetaRule(state) {
@@ -37,9 +37,9 @@ module.exports = function (md, opts) {
     render: function (tokens, idx) {
       if (tokens[idx].nesting === 1) {
         return (
-          '<section class="CitationBlock">' +
+          '<section class="DocumentBlock">' +
             '<div>' +
-              '<a href="' + tokens[idx].meta.enItemURL + '" class="CitationBlock--Citation">' +
+              '<a href="' + tokens[idx].meta.enItemURL + '" class="DocumentBlock--Citation">' +
               tokens[idx].meta.enCitationText +
               '</a>' +
             '</div>'

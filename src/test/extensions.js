@@ -137,10 +137,10 @@ test('Document block', function (t) {
   });
 
   t.equal(
-    parser.render('::: document 1\nThis is in the document block.\n:::\nThis is not.').trim(),
+    parser.render('::: document @@d1\nThis is in the document block.\n:::\nThis is not.').trim(),
     (
-      '<section class="CitationBlock"><div>' +
-      '<a href="/projects/emma/documents/1/" class="CitationBlock--Citation">Document #1</a>' +
+      '<section class="DocumentBlock"><div>' +
+      '<a href="/projects/emma/documents/1/" class="DocumentBlock--Citation">Document #1</a>' +
       '</div>' +
       '<p>This is in the document block.</p>\n</section><p>This is not.</p>'
     )
