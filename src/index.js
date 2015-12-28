@@ -21,12 +21,12 @@ module.exports = function (opts) {
     .use(hrefPlugin, {
       projectBaseURL: opts.projectBaseURL
     })
-    .use(citationPlugin, {
-      projectBaseURL: opts.projectBaseURL,
-      makeInlineCitation: opts.makeInlineCitation
-    })
     .use(documentBlockPlugin, {
       projectBaseURL: opts.projectBaseURL,
       makeBibliographyEntry: opts.makeBibliographyEntry
+    })
+    .use(citationPlugin, {
+      projectBaseURL: opts.projectBaseURL,
+      makeInlineCitation: opts.makeInlineCitation
     })
 }

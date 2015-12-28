@@ -2,6 +2,7 @@
 
 var parseLinkLabel = require('markdown-it/lib/helpers/parse_link_label')
   , citeRegex = /(.* )?@@d(\d+)(, .*)?/
+  , impliedDocumentCiteRegex = /^\[[^@;]+\]$/
 
 
 function getCitations(label, makeURL) {
@@ -25,25 +26,95 @@ function getCitations(label, makeURL) {
     });
 }
 
-function createBlockquoteRule() {
+
+function citationTokens(state, citations, makeInlineCitation, push) {
+  let tokens = push ? undefined : []
+    , token
+    , inlineCitation
+
+  function makeToken(type, tag, nesting) {
+    if (push) {
+      return state.push(type, tag, nesting);
+    } else {
+      let token = new state.Token(type, tag, nesting);
+      tokens.push(token);
+      return token;
+    }
+  }
+
+  inlineCitation = makeInlineCitation(citations);
+
+  // Insert citation tokens for each citation
+  // TODO: maybe be more sophisticated about this?
+  token = makeToken('en_cite_section_open', 'cite', 1);
+  debugger;
+  token.meta = { citations }
+
+  if (inlineCitation.prefix) {
+    token = makeToken('text', '', 0);
+    token.content = inlineCitation.prefix;
+  }
+
+  inlineCitation.citations.forEach(function (citeText, idx) {
+    token = makeToken('en_cite_open', 'a', 1);
+    token.attrs = [
+      [ 'href', citations[idx].url ],
+      [ 'class', 'ENInlineReference ENInlineReference-document' ]
+    ];
+
+    token.meta = {
+      enItemType: 'document',
+      enItemID: citations[idx].id,
+      enItemURL: citations[idx].url,
+    }
+
+    token = makeToken('text', '', 0);
+    token.content = citeText.trim();
+
+    token = makeToken('en_cite_close', 'a', -1);
+
+    if (idx < citations.length - 1) {
+      token = makeToken('text', '', 0);
+      token.content = inlineCitation.delimiter;
+    }
+  });
+
+  token = makeToken('en_cite_section_close', 'cite', -1);
+
+  return tokens;
+}
+
+
+function createBlockquoteRule(md, projectBaseURL, makeInlineCitation) {
   return function enBlockquoteCitations(state) {
     var blockTokens = state.tokens
       , currentBlockquote = {}
       , blockquotes = []
+      , _citationBlockDocumentData = null
 
     blockTokens.forEach(function (token, idx) {
+      if (token.type === 'container_document_open') {
+        _citationBlockDocumentData = token.meta;
+      }
+
+      if (token.type === 'container_document_closed') {
+        _citationBlockDocumentData = null;
+      }
+
       if (token.type === 'blockquote_open') {
         currentBlockquote[token.level] = idx;
       }
 
       if (token.type === 'blockquote_close') {
-        blockquotes.push([currentBlockquote[token.level], idx]);
+        blockquotes.push([currentBlockquote[token.level], idx, _citationBlockDocumentData]);
       }
     });
 
-    blockquotes.forEach(function (indices) {
-      var blockStart = indices[0]
-        , blockStop = indices[1]
+    blockquotes.forEach(function (data) {
+      var blockStart = data[0]
+        , blockStop = data[1]
+        , citationBlockDocumentData = data[2]
+        , inCitationBlock = citationBlockDocumentData !== null
         , containsClosingCitation
 
       // FIXME figure out the best number on this first check. It should just
@@ -54,12 +125,24 @@ function createBlockquoteRule() {
         blockTokens[blockStop - 1].type === 'paragraph_close' &&
         blockTokens[blockStop - 2].type === 'inline' &&
         blockTokens[blockStop - 2].children &&
-        blockTokens[blockStop - 2].children.length === 5 &&
-        blockTokens[blockStop - 2].children[0].type === 'en_cite_section_open' &&
-        blockTokens[blockStop - 2].children[1].type === 'en_cite_open' &&
-        blockTokens[blockStop - 2].children[2].type === 'text' &&
-        blockTokens[blockStop - 2].children[3].type === 'en_cite_close' &&
-        blockTokens[blockStop - 2].children[4].type === 'en_cite_section_close'
+        (
+          !inCitationBlock &&
+          blockTokens[blockStop - 2].children.length === 5 &&
+          blockTokens[blockStop - 2].children[0].type === 'en_cite_section_open' &&
+          blockTokens[blockStop - 2].children[1].type === 'en_cite_open' &&
+          blockTokens[blockStop - 2].children[2].type === 'text' &&
+          blockTokens[blockStop - 2].children[3].type === 'en_cite_close' &&
+          blockTokens[blockStop - 2].children[4].type === 'en_cite_section_close'
+        )
+
+        ||
+
+        (
+          inCitationBlock &&
+          blockTokens[blockStop - 2].children.length === 1 &&
+          blockTokens[blockStop - 2].children[0].type === 'text' &&
+          impliedDocumentCiteRegex.test(blockTokens[blockStop - 2].children[0].content)
+        )
       );
 
       if (!containsClosingCitation) return;
@@ -71,9 +154,20 @@ function createBlockquoteRule() {
       blockTokens[blockStop - 3].tag = 'footer';
       blockTokens[blockStop - 1].type = 'blockquote_citation_footer_close';
       blockTokens[blockStop - 1].tag = 'footer';
+
+      if (inCitationBlock) {
+        let citations = [{
+          id: citationBlockDocumentData.enItemID,
+          url: citationBlockDocumentData.enItemURL,
+          locator: blockTokens[blockStop - 2].children[0].content.slice(1, -1)
+        }]
+
+        blockTokens[blockStop - 2].children = citationTokens(state, citations, makeInlineCitation);
+      }
     });
   }
 }
+
 
 function createInlineCitationRule(md, projectBaseURL, makeInlineCitation) {
   var makeURL = require('./get_item_url').bind(null, projectBaseURL, 'document')
@@ -84,8 +178,6 @@ function createInlineCitationRule(md, projectBaseURL, makeInlineCitation) {
       , labelEnd
       , label
       , citations
-      , inlineCitation
-      , token
 
     // Continue only if starting with a link label
     if (state.src[state.pos] !== '[') return false;
@@ -99,8 +191,10 @@ function createInlineCitationRule(md, projectBaseURL, makeInlineCitation) {
     // Skip if this is [label](link)
     if (state.src[labelEnd + 1] === '(') return false;
 
+    // This will be the text between the square brackets
     label = state.src.slice(labelStart, labelEnd);
 
+    // Only continue if the label is a citation
     if (!citeRegex.test(label)) return false;
 
     citations = getCitations(label, makeURL);
@@ -108,53 +202,12 @@ function createInlineCitationRule(md, projectBaseURL, makeInlineCitation) {
     // If every citation is not formatted correctly, stop
     if (!citations) return false;
 
-    inlineCitation = makeInlineCitation(citations);
-
-    // Advance state past the opening bracke, up to the last char of the label
+    // Advance state past the opening bracket, up to the last char of the label
     state.pos = labelStart;
     state.posMax = labelEnd;
 
-    // Insert citation tokens for each citation
-    // TODO: maybe be more sophisticated about this?
-    token = state.push('en_cite_section_open', 'cite', 1);
-    token.meta = { citations }
-
-    if (inlineCitation.prefix) {
-      token = state.push('text', '', 0);
-      token.content = inlineCitation.prefix;
-    }
-
-    inlineCitation.citations.forEach(function (citeText, idx) {
-      token = state.push('en_cite_open', 'a', 1);
-      token.attrs = [
-        [ 'href', citations[idx].url ],
-        [ 'class', 'ENInlineReference ENInlineReference-document' ]
-      ];
-
-      token.meta = {
-        enItemType: 'document',
-        enItemID: citations[idx].id,
-        enItemURL: citations[idx].url,
-      }
-
-      token = state.push('text', '', 0);
-      token.content = citeText.trim();
-
-      token = state.push('en_cite_close', 'a', -1);
-
-      if (idx < citations.length - 1) {
-        token = state.push('text', '', 0);
-        token.content = inlineCitation.delimiter;
-      }
-    });
-
-    if (inlineCitation.suffix) {
-      token = state.push('text', '', 0);
-      token.content = inlineCitation.suffix;
-    }
-
-
-    token = state.push('en_cite_section_close', 'cite', -1);
+    // Push citation tokens into state
+    citationTokens(state, citations, makeInlineCitation, true);
 
     // Advance state past the closing ']'
     state.pos = labelEnd + 1;
@@ -162,6 +215,7 @@ function createInlineCitationRule(md, projectBaseURL, makeInlineCitation) {
     return true;
   }
 }
+
 
 module.exports = function (md, opts) {
   opts = opts || {};
