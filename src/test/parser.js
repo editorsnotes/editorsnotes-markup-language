@@ -10,7 +10,7 @@ test('Citations in document blocks', function (t) {
       citations: cites.map(d => 'INLINE ' + d.id + ', ' + d.locator),
     }),
     makeBibliographyEntry: d => 'BIBLIOGRAPHY ' + d.id,
-    resolveItemText: d => null
+    resolveItemText: () => null
   })
 
   var markdown = `

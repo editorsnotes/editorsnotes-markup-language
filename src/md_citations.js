@@ -36,9 +36,9 @@ function citationTokens(state, citations, makeInlineCitation, push) {
     if (push) {
       return state.push(type, tag, nesting);
     } else {
-      let token = new state.Token(type, tag, nesting);
-      tokens.push(token);
-      return token;
+      let _token = new state.Token(type, tag, nesting);
+      tokens.push(_token);
+      return _token;
     }
   }
 
@@ -47,7 +47,6 @@ function citationTokens(state, citations, makeInlineCitation, push) {
   // Insert citation tokens for each citation
   // TODO: maybe be more sophisticated about this?
   token = makeToken('en_cite_section_open', 'cite', 1);
-  debugger;
   token.meta = { citations }
 
   if (inlineCitation.prefix) {
