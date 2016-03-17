@@ -76,12 +76,12 @@ function citationTokens(state, citations, makeInlineCitation, push) {
       token = makeToken('text', '', 0);
       token.content = inlineCitation.delimiter;
     }
-
-    if (inlineCitation.suffix) {
-      token = makeToken('text', '', 0);
-      token.content = inlineCitation.suffix;
-    }
   });
+
+  if (inlineCitation.suffix) {
+    token = makeToken('text', '', 0);
+    token.content = inlineCitation.suffix;
+  }
 
   token = makeToken('en_cite_section_close', 'cite', -1);
 
